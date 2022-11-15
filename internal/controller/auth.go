@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Vitaly-Baidin/auth-api/internal/model"
 	db "github.com/Vitaly-Baidin/auth-api/internal/model/db"
 	"github.com/Vitaly-Baidin/auth-api/internal/service"
@@ -41,8 +40,6 @@ func (c *AuthContr) Register(rw http.ResponseWriter, r *http.Request) {
 		res.SendResponse(rw)
 		return
 	}
-
-	fmt.Println(string(body))
 
 	err = json.Unmarshal(body, &reqBody)
 	if err != nil {

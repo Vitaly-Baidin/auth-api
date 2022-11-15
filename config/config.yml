@@ -1,0 +1,26 @@
+app:
+  name: "auth"
+  version: "1.0.0"
+
+jwt:
+  secret: "SECRET_KEY"
+  access_expire_in_minute: 10
+  refresh_expire_in_hour: 24
+
+
+
+http:
+  port: "8080"
+  read_timeout_in_sec: 15 # default 15 sec
+  write_timeout_in_sec: 15 # default 15 sec
+  shutdown_timeout_in_sec: 15 # default 15 sec
+
+postgres:
+  url: "postgres://root:rootroot@localhost:5432/auth"
+  pool_max: 8 # default 10 pool
+  conn_attempts: 10 # default 10
+  conn_timeout_in_sec: 1 # default 1 sec
+
+redis:
+  addresses: ["server1", ":6379"] # ["name_serv1", "port1", "name_serv2", "port2"....]
+

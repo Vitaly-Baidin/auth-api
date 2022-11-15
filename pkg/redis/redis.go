@@ -7,23 +7,38 @@ import (
 )
 
 type Redis struct {
+	addresses map[string]string
+
 	Client *redis.Ring
 	Cache  *cache.Cache
 }
 
-func New(url string) (*Redis, error) {
-	r := redis.NewRing(&redis.RingOptions{
-		Addrs: map[string]string{
-			"server1": ":6379", // TODO вынести в конфиг
+func New(opts ...Option) (*Redis, error) {
+	r := &Redis{
+		addresses: map[string]string{
+			"server1": ":6379",
 		},
+	}
+
+	for _, opt := range opts {
+		opt(r)
+	}
+
+	ring := redis.NewRing(&redis.RingOptions{
+		Addrs: r.addresses,
 	})
+
 	c := cache.New(&cache.Options{
-		Redis:      r,
+		Redis:      ring,
 		LocalCache: cache.NewTinyLFU(1000, time.Minute),
 	})
 
 	return &Redis{
-		Client: r,
+		Client: ring,
 		Cache:  c,
 	}, nil
+}
+
+func (r *Redis) Close() error {
+	return r.Client.Close()
 }
