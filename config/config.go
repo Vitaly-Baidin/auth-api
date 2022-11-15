@@ -21,7 +21,7 @@ type (
 	}
 
 	JWT struct {
-		Secret               string `env-required:"true" yaml:"name" env:"JWT_SECRET"`
+		Secret               string `env-required:"true" yaml:"secret" env:"JWT_SECRET"`
 		AccessExpireInMinute int    `env-required:"true" yaml:"access_expire_in_minute"`
 		RefreshExpireInHour  int    `env-required:"true" yaml:"refresh_expire_in_hour"`
 	}
@@ -41,7 +41,7 @@ type (
 	}
 
 	Redis struct {
-		Addresses []string `env-required:"true" yaml:"addresses"`
+		Addresses []string `env-required:"true" yaml:"addresses" env:"REDIS_URL"`
 	}
 )
 

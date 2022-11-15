@@ -24,9 +24,12 @@ func main() {
 		log.Fatalf("Config error: %s", err)
 	}
 
+	fmt.Println(cfg.PG.URL)
+	fmt.Println(cfg.Redis.Addresses)
+
 	// PostgreSQL + Redis
 	pg, err := postgres.New(
-		"postgres://root:rootroot@localhost:5432/auth",
+		cfg.PG.URL,
 		postgres.MaxPoolSize(cfg.PG.PoolMax),
 		postgres.ConnAttempts(cfg.PG.ConnAttempts),
 		postgres.ConnTimeout(time.Duration(cfg.PG.ConnTimeoutInSec)*time.Second),
@@ -35,14 +38,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	r, err := redis.New(redis.Addresses([]string{"server1", ":6379"}))
+	r, err := redis.New(redis.Addresses(cfg.Redis.Addresses))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Migration
 
-	migration("postgres://root:rootroot@localhost:5432/auth")
+	migration(cfg.PG.URL)
 
 	// Repositories
 	var ur repository.UserRepository = repository.NewUserRepoPG(pg)

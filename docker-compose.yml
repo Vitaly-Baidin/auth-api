@@ -9,7 +9,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    restart: unless-stopped
+    restart: on-failure
+    environment:
+      PG_URL: "postgres://root:rootroot@postgres:5432/auth"
+      REDIS_URL: "server1,redis:6379"
     depends_on:
       - postgres
       - redis

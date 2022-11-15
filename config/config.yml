@@ -7,8 +7,6 @@ jwt:
   access_expire_in_minute: 10
   refresh_expire_in_hour: 24
 
-
-
 http:
   port: "8080"
   read_timeout_in_sec: 15 # default 15 sec
