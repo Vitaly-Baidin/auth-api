@@ -22,8 +22,8 @@ const (
 
 func InitAuthRoutes(mux *http.ServeMux, ac controller.AuthController) {
 	mux.Handle(authRegisterPath, validators.RegisterValidator(http.HandlerFunc(ac.Register)))
-	mux.Handle(authLoginPath, validators.RegisterValidator(http.HandlerFunc(ac.Login)))
-	mux.Handle(authRefreshPost, validators.RegisterValidator(http.HandlerFunc(ac.Refresh)))
+	mux.Handle(authLoginPath, validators.LoginValidator(http.HandlerFunc(ac.Login)))
+	mux.Handle(authRefreshPost, validators.RefreshValidator(http.HandlerFunc(ac.Refresh)))
 }
 
 func InitTestRoutes(mux *http.ServeMux, ts service.TokenService) {

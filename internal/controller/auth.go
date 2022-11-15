@@ -2,10 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Vitaly-Baidin/auth-api/internal/model"
 	db "github.com/Vitaly-Baidin/auth-api/internal/model/db"
 	"github.com/Vitaly-Baidin/auth-api/internal/service"
 	"golang.org/x/crypto/bcrypt"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -33,8 +35,16 @@ func (c *AuthContr) Register(rw http.ResponseWriter, r *http.Request) {
 		Success:    false,
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&reqBody)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		res.Message = err.Error()
+		res.SendResponse(rw)
+		return
+	}
+
+	fmt.Println(string(body))
+
+	err = json.Unmarshal(body, &reqBody)
 	if err != nil {
 		res.Message = err.Error()
 		res.SendResponse(rw)
