@@ -9,9 +9,6 @@ const (
 	TokenTypeRefresh = "refresh"
 )
 
-// TODO: key in redis = UserID:Type -> token
-// TODO: added cache service in memory
-
 type Token struct {
 	UserID    uint      `json:"user_id"`
 	Token     string    `json:"token"`

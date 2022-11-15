@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/Vitaly-Baidin/auth-api/config"
 	db "github.com/Vitaly-Baidin/auth-api/internal/model/db"
 	"github.com/Vitaly-Baidin/auth-api/internal/repository"
 	"github.com/golang-jwt/jwt/v4"
@@ -24,11 +25,12 @@ type TokenService interface {
 }
 
 type TokenServ struct {
+	cfg  *config.Config
 	repo repository.TokenRepository
 }
 
-func NewTokenService(r repository.TokenRepository) *TokenServ {
-	return &TokenServ{repo: r}
+func NewTokenService(cfg *config.Config, r repository.TokenRepository) *TokenServ {
+	return &TokenServ{cfg: cfg, repo: r}
 }
 
 func (s *TokenServ) CreateToken(ctx context.Context, u *db.User, tokenType string, expiresAt time.Time) (*db.Token, error) {
@@ -43,7 +45,7 @@ func (s *TokenServ) CreateToken(ctx context.Context, u *db.User, tokenType strin
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("SECRET_KEY")) // TODO: вынести в конфиг
+	tokenString, err := token.SignedString([]byte(s.cfg.JWT.Secret))
 	if err != nil {
 		return nil, fmt.Errorf("failed create access token: %v", err)
 	}
@@ -67,8 +69,8 @@ func (s *TokenServ) DeleteToken(ctx context.Context, userID uint, tokenType stri
 }
 
 func (s *TokenServ) GenerateAccessTokens(ctx context.Context, u *db.User) (*db.Token, *db.Token, error) {
-	accessExpiresAt := time.Now().Add(time.Duration(10) * time.Minute)     // TODO: вынести в конфиг
-	refreshExpiresAt := time.Now().Add(time.Duration(10) * time.Hour * 24) // TODO: вынести в конфиг
+	accessExpiresAt := time.Now().Add(time.Duration(s.cfg.JWT.AccessExpireInMinute) * time.Minute)
+	refreshExpiresAt := time.Now().Add(time.Duration(s.cfg.JWT.RefreshExpireInHour) * time.Hour * 24)
 
 	accessToken, err := s.CreateToken(ctx, u, db.TokenTypeAccess, accessExpiresAt)
 	if err != nil {
@@ -86,7 +88,7 @@ func (s *TokenServ) GenerateAccessTokens(ctx context.Context, u *db.User) (*db.T
 func (s *TokenServ) VerifyToken(ctx context.Context, token string, tokenType string) (*db.Token, error) {
 	claims := &db.UserClaims{}
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("SECRET_KEY"), nil // TODO: Вынести в конфиг
+		return []byte(s.cfg.JWT.Secret), nil
 	})
 
 	if err != nil || claims.Type != tokenType {
